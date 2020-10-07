@@ -30,9 +30,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String RESTORE_PASSWORD = "/api/restore_password/**";
     private static final String TWO_FA = "/api/confirm_login";
 
-
-
-
     @Autowired
     public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;

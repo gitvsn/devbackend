@@ -6,9 +6,11 @@ import com.vsn.config.rest.model.MvcResponseObject;
 import com.vsn.dto.AuthorizationDTO;
 import com.vsn.entities.confirm.ConfirmLogin;
 import com.vsn.entities.registration.User;
+import com.vsn.entities.registration.UserInfo;
 import com.vsn.exceptions.RegistrationValidDataException;
 import com.vsn.securiry.jwt.JwtTokenProvider;
 import com.vsn.services.interfaces.ConfirmLoginService;
+import com.vsn.services.interfaces.UserInfoService;
 import com.vsn.services.interfaces.UserService;
 import com.vsn.utils.email.EmailSender;
 import lombok.RequiredArgsConstructor;
@@ -34,14 +36,15 @@ import java.util.Map;
 @RequestMapping(value = "/api")
 public class AuthenticationController {
 
-    @Value("${confirm.login}")
-    private Boolean confirmLogin;
+//    @Value("${confirm.login}")
+//    private Boolean confirmLogin;
     @Autowired
     private String clientAddress;
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final UserInfoService userInfoService;
     private final EmailSender emailSender;
     private final ConfirmLoginService confirmLoginService;
 
@@ -51,7 +54,6 @@ public class AuthenticationController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authorization.getEmail(), authorization.getPassword()));
             User user = userService.findByEmail(authorization.getEmail());
-
 
             if (user == null) {
                 throw new UsernameNotFoundException("User with email: " + authorization.getEmail() + " not found");
@@ -64,9 +66,11 @@ public class AuthenticationController {
             Map<Object, Object> response = new HashMap<>();
             response.put("username", authorization.getEmail());
 
-            if (confirmLogin) {
+            if (userInfoService.twoFaIsEnable(user)) {
                 ConfirmLogin confirmLogin = confirmLoginService.createConfirmLogin(user);
                 emailSender.sendEmailOnLoginConfirm(user.getEmail(), confirmLogin.getCode());
+            } else {
+                response.put("token", token);
             }
 
             return new MvcResponseObject(200, response);
@@ -126,7 +130,6 @@ public class AuthenticationController {
                 userService.changePassword(user,password);
                 log.info("Success change password user {}",user.getEmail());
             }
-
 
             return ResponseEntity.ok(null);
         } catch (AuthenticationException e) {
