@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
@@ -21,6 +22,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
  */
 @EnableScheduling
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -29,9 +31,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String REGISTRATION_ENDPOINT = "/api/registration";
     private static final String RESTORE_PASSWORD = "/api/restore_password/**";
     private static final String TWO_FA = "/api/confirm_login";
-
-
-
 
     @Autowired
     public SecurityConfig(JwtTokenProvider jwtTokenProvider) {

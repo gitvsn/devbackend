@@ -22,7 +22,7 @@ public class ServerConfig {
 
     @Bean
     public String ethWalletPassword(){
-        return  "secr3t";
+        return "secr3t";
     }
 
     @Bean
