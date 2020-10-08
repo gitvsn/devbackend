@@ -3,15 +3,18 @@ package com.vsn.services.impl;
 
 import com.vsn.entities.wallets.Currency;
 import com.vsn.utils.requests.RequestHelper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
-@Log4j2
+@RequiredArgsConstructor
 public class CurrencyPriceService {
     private String getSymbolId(String symbol) {
         symbol = symbol.toLowerCase();

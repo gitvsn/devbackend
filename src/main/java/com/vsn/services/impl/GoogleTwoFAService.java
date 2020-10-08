@@ -1,13 +1,19 @@
 package com.vsn.services.impl;
 
 import de.taimos.totp.TOTP;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
 
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class GoogleTwoFAService {
     private static String QR_PREFIX = "https://chart.googleapis.com/chart?chs=300x300&chld=M%%7C0&cht=qr&chl=";
 

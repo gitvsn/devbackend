@@ -8,6 +8,7 @@ import com.vsn.repositories.UserInfoRepository;
 import com.vsn.services.interfaces.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserInfoServiceImpl implements UserInfoService {

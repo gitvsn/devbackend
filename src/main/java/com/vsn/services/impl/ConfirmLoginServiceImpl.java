@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ConfirmLoginServiceImpl implements ConfirmLoginService {
 
     private  final ConfirmLoginRepository confirmLoginRepository;
