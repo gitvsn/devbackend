@@ -30,7 +30,7 @@ public class EthBaseService {
 
 
     public EthBaseService(WalletRepository walletRepository, TransactionsService transactionsService) {
-        this.web3j = connectionPool();
+        this.web3j = null;
         this.walletRepository = walletRepository;
         this.transactionsService = transactionsService;
     }
