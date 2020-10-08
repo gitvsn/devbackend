@@ -7,6 +7,7 @@ import com.vsn.dto.AuthorizationDTO;
 import com.vsn.entities.confirm.ConfirmLogin;
 import com.vsn.entities.registration.User;
 import com.vsn.entities.registration.UserInfo;
+import com.vsn.entities.registration.UserToken;
 import com.vsn.exceptions.RegistrationValidDataException;
 import com.vsn.securiry.jwt.JwtTokenProvider;
 import com.vsn.services.interfaces.ConfirmLoginService;
@@ -69,7 +70,9 @@ public class AuthenticationController {
             if (userInfoService.twoFaIsEnable(user)) {
                 ConfirmLogin confirmLogin = confirmLoginService.createConfirmLogin(user);
                 emailSender.sendEmailOnLoginConfirm(user.getEmail(), confirmLogin.getCode());
+                response.put("twoFaEnable", true);
             } else {
+                response.put("twoFaEnable", false);
                 response.put("token", token);
             }
 
