@@ -6,6 +6,7 @@ import com.vsn.dto.RegistrationUserDTO;
 import com.vsn.exceptions.RegistrationValidDataException;
 import com.vsn.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,19 +31,18 @@ import java.io.IOException;
 public class RegistrationController {
     private final UserService userService;
 
+    @SneakyThrows
     @RequestMapping(value = "/registration", method = RequestMethod.POST, produces = "application/json")
     public MvcResponse registration(@RequestBody RegistrationUserDTO data, HttpServletRequest request, HttpServletResponse response) {
-
-        System.out.println(data);
-        try {
+     //   try {
             userService.register(data);
-        } catch (RegistrationValidDataException e) {
-            return new MvcResponseError(400, e.getMessage());
-        } catch (IOException ex) {
-            return new MvcResponseError(400, "Error created wallets");
-        } catch (Exception ex) {
-            return new MvcResponseError(400, "Error registration");
-        }
-        return new MvcResponse(200);
+//        } catch (RegistrationValidDataException e) {
+//            return new MvcResponseError(400, e.getMessage());
+//        } catch (IOException ex) {
+//            return new MvcResponseError(400, "Error created wallets");
+//        } catch (Exception ex) {
+//            return new MvcResponseError(400, "Error registration");
+//        }
+//        return new MvcResponse(200);
     }
 }
