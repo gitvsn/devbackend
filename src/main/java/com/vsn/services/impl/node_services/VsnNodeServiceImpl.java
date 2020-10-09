@@ -62,7 +62,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
     private static final ERC20Tokens token = ERC20Tokens.VSN;
     private static final Currency currency = ERC20Tokens.convertToCurrency(token);
-    private static final BigInteger GAS_LIMIT = BigInteger.valueOf(21_000L);
+
 
 
 
@@ -92,7 +92,8 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
     @Override
     public String sendToAddress(Wallet wallet, String addressTo, double amountDouble) throws  IOException, NotEnoughGas {
         log.info("Invoked send to {} in amount {}", addressTo, amountDouble);
-        BigInteger amount = new BigInteger(Double.toString(amountDouble));
+
+        BigInteger amount = BigDecimal.valueOf(amountDouble).toBigInteger();
 
         transferERC20Token(wallet,addressTo,amount);
         return  "";
@@ -113,10 +114,11 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
         Credentials fromWalletCredentials = getCredentials(fromWallet);
         BigInteger gasPrice = getGasPrice();
+        BigInteger gasLimit = getGasLimit();
 
         log.info("Gas price: " + gasPrice);
-        log.info("Gas limit: " + GAS_LIMIT);
-        RawTransaction rawTransaction = getRawTransaction(fromWallet.getAddress(), to, value, token.contractAddress, GAS_LIMIT, gasPrice);
+        log.info("Gas limit: " + gasLimit);
+        RawTransaction rawTransaction = getRawTransaction(fromWallet.getAddress(), to, value, token.contractAddress, gasLimit, gasPrice);
 
         byte[] signMessage = TransactionEncoder.signMessage(rawTransaction, fromWalletCredentials);
         String hexValue = Numeric.toHexString(signMessage);
@@ -160,10 +162,11 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
         Credentials fromWalletCredentials = getCredentials(from);
         BigInteger gasPrice = getGasPrice();
+        BigInteger gasLimit = getGasLimit();
 
         log.info("Gas price: " + gasPrice);
-        log.info("Gas limit: " + GAS_LIMIT);
-        RawTransaction rawTransaction = getRawTransaction(from, to, value, token.contractAddress, GAS_LIMIT, gasPrice);
+        log.info("Gas limit: " + gasLimit);
+        RawTransaction rawTransaction = getRawTransaction(from, to, value, token.contractAddress, gasLimit, gasPrice);
 
         byte[] signMessage = TransactionEncoder.signMessage(rawTransaction, fromWalletCredentials);
         String hexValue = Numeric.toHexString(signMessage);
@@ -227,8 +230,14 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
     }
 
     @SneakyThrows
+    private BigInteger getGasLimit(){
+        return  new BigDecimal(100000).toBigInteger();
+     //  return web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST,true).send().getBlock().getGasLimit();
+    }
+
+    @SneakyThrows
     private BigInteger getFee() {
-        BigInteger totalGas = Transfer.GAS_LIMIT.multiply(getGasPrice());
+        BigInteger totalGas = getGasLimit().multiply(getGasPrice());
         return (Convert.fromWei(totalGas.toString(), Convert.Unit.ETHER)).toBigInteger();
     }
 
@@ -265,7 +274,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
     private EthFilter getFilterRequest() {
         // TODO test data
-       //  DefaultBlockParameter startBlock = DefaultBlockParameter.valueOf(new BigInteger("11021191"));
+        // DefaultBlockParameter startBlock = DefaultBlockParameter.valueOf(new BigInteger("11023463"));
 
         EthFilter filter = new EthFilter(LATEST, LATEST, token.contractAddress);
         filter.addSingleTopic(EventEncoder.encode(TRANSFER_EVENT));
@@ -329,7 +338,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
             this.contract = log.getAddress();
             this.from = "0x" + topics.get(1).substring(26);
             this.to = "0x" + topics.get(2).substring(26);
-            this.amount = getDecNumber(new BigDecimal(new BigInteger(log.getData().substring(2), 16)));
+            this.amount = (new BigDecimal(new BigInteger(log.getData().substring(2), 16)));
             this.blockNumber = log.getBlockNumber();
 
             return this;
