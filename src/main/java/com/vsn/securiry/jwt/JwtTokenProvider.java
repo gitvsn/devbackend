@@ -24,7 +24,6 @@ import java.util.Date;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class JwtTokenProvider {
 
     @Value("${jwt.token.secret}")
@@ -32,7 +31,6 @@ public class JwtTokenProvider {
 
     @Value("${jwt.token.expired}")
     private long validityInMilliseconds;
-
 
     @Autowired
     private UserDetailsService userDetailsService;
