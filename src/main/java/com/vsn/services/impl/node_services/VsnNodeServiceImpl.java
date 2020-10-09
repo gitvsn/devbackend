@@ -90,14 +90,61 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
 
     @Override
-    public String sendToAddress(Wallet wallet, String addressTo, double amountDouble) throws WrongBalanceException {
+    public String sendToAddress(Wallet wallet, String addressTo, double amountDouble) throws  IOException, NotEnoughGas {
         log.info("Invoked send to {} in amount {}", addressTo, amountDouble);
+        BigInteger amount = new BigInteger(Double.toString(amountDouble));
+
+        transferERC20Token(wallet,addressTo,amount);
         return  "";
     }
 
     @Override
     public BigDecimal getBalanceWallet(@NotNull Wallet wallet) {
         return wallet.getBalance();
+    }
+
+    private void transferERC20Token(Wallet fromWallet, String to, BigInteger value) throws IOException, NotEnoughGas {
+
+        log.info(token + " Tokens " + value + " from address {} sent to {}", fromWallet.getAddress(), to);
+
+        if(getFee().compareTo(getEthBalance(fromWallet.getAddress())) > 0){
+            throw new NotEnoughGas("Not enough gas " + getFee());
+        }
+
+        Credentials fromWalletCredentials = getCredentials(fromWallet);
+        BigInteger gasPrice = getGasPrice();
+
+        log.info("Gas price: " + gasPrice);
+        log.info("Gas limit: " + GAS_LIMIT);
+        RawTransaction rawTransaction = getRawTransaction(fromWallet.getAddress(), to, value, token.contractAddress, GAS_LIMIT, gasPrice);
+
+        byte[] signMessage = TransactionEncoder.signMessage(rawTransaction, fromWalletCredentials);
+        String hexValue = Numeric.toHexString(signMessage);
+        //Send the transaction
+        EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).send();
+
+        if(ethSendTransaction.getTransactionHash() != null) {
+            log.info("Send transaction: {}", ethSendTransaction);
+
+            log.debug("Funds " + value + " sent to "+ to+" account!!!");
+
+            String hash = ethSendTransaction.getTransactionHash();
+            fromWallet.setBalance(fromWallet.getBalance().subtract(new BigDecimal(value)));
+
+
+            walletRepository.save(fromWallet);
+            transactionsService.saveTransaction(
+                    com.vsn.entities.transactions.Transaction.builder()
+                            .hash(hash)
+                            .amount(new BigDecimal(value))
+                            .currency(currency)
+                            .status(TransactionStatus.SUCCESS)
+                            .type(TransactionType.WITHDRAW)
+                            .userId(fromWallet.getUserId())
+                            .build());
+        } else {
+            throw new  RuntimeException("Error transfer");
+        }
     }
 
     private void transferERC20Token(String from, String to, BigInteger value) throws IOException, NotEnoughGas {

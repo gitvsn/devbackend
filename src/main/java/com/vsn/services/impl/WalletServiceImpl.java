@@ -4,6 +4,7 @@ import com.vsn.dto.SendDTO;
 import com.vsn.entities.registration.User;
 import com.vsn.entities.wallets.Currency;
 import com.vsn.entities.wallets.Wallet;
+import com.vsn.exceptions.NotEnoughGas;
 import com.vsn.exceptions.WrongBalanceException;
 import com.vsn.repositories.WalletRepository;
 import com.vsn.services.impl.node_services.VsnNodeServiceImpl;
@@ -79,7 +80,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public boolean sendToAddress(SendDTO sendDTO, User user) throws WrongBalanceException {
+    public boolean sendToAddress(SendDTO sendDTO, User user) throws WrongBalanceException, IOException, NotEnoughGas {
         Currency currency = sendDTO.getCurrency();
         Wallet userWallet = walletRepository.getByUserIdAndCurrency(user.getId(), currency);
 

@@ -2,6 +2,7 @@ package com.vsn.services.interfaces;
 
 import com.vsn.entities.registration.User;
 import com.vsn.entities.wallets.Wallet;
+import com.vsn.exceptions.NotEnoughGas;
 import com.vsn.exceptions.WrongBalanceException;
 import org.web3j.crypto.CipherException;
 
@@ -19,6 +20,6 @@ public interface NodeService {
 
     BigDecimal getBalanceWallet(Wallet  wallet) throws IOException;
 
-    String sendToAddress(Wallet wallet,String address,double amount) throws WrongBalanceException;
+    String sendToAddress(Wallet wallet,String address,double amount) throws WrongBalanceException, IOException, NotEnoughGas;
 
 }
