@@ -9,4 +9,4 @@
 
                                                                                                         ${Ansi.BRIGHT_YELLOW}======================
                                                                                                            ${Ansi.BRIGHT_YELLOW}================
-                                                                                                             == v1.0 ==
+                                                                                                             == v1.1 ==
