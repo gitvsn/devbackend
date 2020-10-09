@@ -21,7 +21,8 @@ public class InnerPage<T> {
         int endIndex = size > list.size() ? list.size() :  size * page;
         int startIndex = size > list.size() ? 0 : endIndex - size;
 
-        if(page*size >= list.size()){ endIndex = list.size() - 1;}
+        if(page*size >= list.size()){ endIndex = list.size();}
+
 
         return new PageImpl(list.subList(startIndex,endIndex),pageRequest,list.size());
     }
