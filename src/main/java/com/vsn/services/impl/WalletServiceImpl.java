@@ -6,17 +6,17 @@ import com.vsn.entities.wallets.Currency;
 import com.vsn.entities.wallets.Wallet;
 import com.vsn.exceptions.WrongBalanceException;
 import com.vsn.repositories.WalletRepository;
-import com.vsn.services.impl.node_services.USDTnodeServiceImpl;
+import com.vsn.services.impl.node_services.VsnNodeServiceImpl;
 import com.vsn.services.interfaces.NodeService;
 import com.vsn.services.interfaces.WalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -26,7 +26,7 @@ import java.util.*;
 public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;
-    private final USDTnodeServiceImpl usdTnodeService;
+    private final VsnNodeServiceImpl vsnNodeService;
     private final CurrencyPriceService currencyPriceService;
 
 
@@ -34,7 +34,7 @@ public class WalletServiceImpl implements WalletService {
     public Wallet createWallets(User user) {
         Wallet usdtWallet = null;
         try {
-             usdtWallet = walletRepository.save(Objects.requireNonNull(getNode(Currency.USDT)).createWallet(user));
+             usdtWallet = walletRepository.save(Objects.requireNonNull(getNode(Currency.VSN)).createWallet(user));
         } catch (Exception e) {
            try {
                walletRepository.delete(usdtWallet);
@@ -65,12 +65,12 @@ public class WalletServiceImpl implements WalletService {
 
 
     @Override
-    public Double getWalletBalance(@NotNull Wallet wallet) throws IOException {
+    public BigDecimal getWalletBalance(@NotNull Wallet wallet) throws IOException {
         return wallet.getBalance();
     }
 
     @Override
-    public double setUserBalance(Wallet wallet, double balance) {
+    public BigDecimal setUserBalance(Wallet wallet, BigDecimal balance) {
         wallet.setBalance(balance);
         walletRepository.save(wallet);
         log.info(String.format("Wallet address : %s , new balance -> %f %s", wallet.getAddress(), wallet.getBalance(), wallet.getCurrency().toString()));
@@ -95,8 +95,8 @@ public class WalletServiceImpl implements WalletService {
 
     @SneakyThrows
     private NodeService getNode(Currency currency) {
-        if (currency.equals(Currency.USDT)) {
-            return usdTnodeService;
+        if (currency.equals(Currency.VSN)) {
+            return vsnNodeService;
         }
         return null;
     }

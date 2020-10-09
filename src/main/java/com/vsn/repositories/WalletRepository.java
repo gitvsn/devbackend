@@ -2,6 +2,7 @@ package com.vsn.repositories;
 
 import com.vsn.entities.wallets.Currency;
 import com.vsn.entities.wallets.Wallet;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 @Data
@@ -23,7 +24,7 @@ public class Transaction extends BaseEntity {
     private String hash;
 
     @Column(name = "amount")
-    private BigInteger amount;
+    private BigDecimal amount;
 
     @JsonIgnore
     @Column(name = "user_id")
