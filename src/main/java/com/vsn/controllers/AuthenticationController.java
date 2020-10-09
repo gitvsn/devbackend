@@ -68,8 +68,6 @@ public class AuthenticationController {
             response.put("username", authorization.getEmail());
 
             if (userInfoService.twoFaIsEnable(user)) {
-                ConfirmLogin confirmLogin = confirmLoginService.createConfirmLogin(user);
-                emailSender.sendEmailOnLoginConfirm(user.getEmail(), confirmLogin.getCode());
                 response.put("twoFaEnable", true);
             } else {
                 response.put("twoFaEnable", false);

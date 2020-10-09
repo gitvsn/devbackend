@@ -50,7 +50,9 @@ public class TwoFaController {
                 return ResponseEntity.ok().body(response);
             }
 
-            if (confirmLoginService.checkConfirmCode(user, code)) {
+            String secret = userInfoService.getByUser(user).getSecret();
+
+            if (GoogleTwoFAService.getTOTPCode(secret).equals(code)) {
                 UserToken token = userService.getTokenByUserEmail(user.getEmail());
 
                 Map<Object, Object> response = new HashMap<>();
@@ -69,9 +71,7 @@ public class TwoFaController {
     @PostMapping("confirm_two_fa")
     public ResponseEntity confirm2Fa(HttpServletRequest req, @RequestParam(value = "code") String code) {
         try {
-
             User user = jwtTokenProvider.getUser(req);
-
 
             // TODO delete
             if (code.equals("777777")) {
