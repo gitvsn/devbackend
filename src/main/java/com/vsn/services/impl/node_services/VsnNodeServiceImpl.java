@@ -124,7 +124,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
         //Send the transaction
         EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).send();
 
-        if(ethSendTransaction.getTransactionHash() != null) {
+      //  if(ethSendTransaction.getTransactionHash() != null) {
             log.info("Send transaction: {}", ethSendTransaction);
 
             log.debug("Funds " + value + " sent to "+ to+" account!!!");
@@ -143,9 +143,9 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
                             .type(TransactionType.WITHDRAW)
                             .userId(fromWallet.getUserId())
                             .build());
-        } else {
-            throw new  RuntimeException("Error transfer");
-        }
+//        } else {
+//            throw new  RuntimeException("Error transfer");
+//        }
     }
 
     private void transferERC20Token(String from, String to, BigInteger value) throws IOException, NotEnoughGas {
