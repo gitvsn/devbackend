@@ -43,6 +43,6 @@ public class RegistrationController {
 //        } catch (Exception ex) {
 //            return new MvcResponseError(400, "Error registration");
 //        }
-//        return new MvcResponse(200);
+        return new MvcResponse(200);
     }
 }
