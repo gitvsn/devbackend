@@ -36,6 +36,7 @@ public class WalletServiceImpl implements WalletService {
         try {
              usdtWallet = walletRepository.save(Objects.requireNonNull(getNode(Currency.VSN)).createWallet(user));
         } catch (Exception e) {
+            e.printStackTrace();
            try {
                walletRepository.delete(usdtWallet);
            }catch (Exception ex){/*ignore*/}
