@@ -54,16 +54,13 @@ public class UserServiceImpl implements UserService {
     public User register(RegistrationUserDTO userDTO) throws RegistrationValidDataException, IOException {
         User user = saveUser(createUser(userDTO)
                 .orElseThrow(() -> new IllegalStateException("It is not possible to create a new user")));
-
         try {
             walletService.createWallets(user);
         }catch (RuntimeException rollback){
             userRepository.delete(user);
             throw  new IOException("error create wallet");
         }
-
         userInfoService.saveUserInfo(createDefaultUserInfo(user,userDTO));
-
         return user;
     }
 

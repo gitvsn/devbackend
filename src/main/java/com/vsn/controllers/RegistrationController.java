@@ -34,15 +34,15 @@ public class RegistrationController {
     @SneakyThrows
     @RequestMapping(value = "/registration", method = RequestMethod.POST, produces = "application/json")
     public MvcResponse registration(@RequestBody RegistrationUserDTO data, HttpServletRequest request, HttpServletResponse response) {
-     //   try {
+        try {
             userService.register(data);
-//        } catch (RegistrationValidDataException e) {
-//            return new MvcResponseError(400, e.getMessage());
-//        } catch (IOException ex) {
-//            return new MvcResponseError(400, "Error created wallets");
-//        } catch (Exception ex) {
-//            return new MvcResponseError(400, "Error registration");
-//        }
+        } catch (RegistrationValidDataException e) {
+            return new MvcResponseError(400, e.getMessage());
+        } catch (IOException ex) {
+            return new MvcResponseError(400, "Error created wallets");
+        } catch (Exception ex) {
+            return new MvcResponseError(400, "Error registration");
+        }
         return new MvcResponse(200);
     }
 }
