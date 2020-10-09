@@ -70,6 +70,10 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
     public Wallet createWallet(@NotNull User user) throws IOException, CipherException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         String walletName = WalletUtils.generateNewWalletFile(ethWalletPassword, new File(ethWalletDirectory));
 
+        System.out.println(ethWalletDirectory);
+        System.out.println(ethWalletPassword);
+        System.out.println(walletName);
+
         Credentials credentials = WalletUtils.loadCredentials(ethWalletPassword, ethWalletDirectory + "/" + walletName);
 
         String accountAddress = credentials.getAddress();
