@@ -231,7 +231,8 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
     @SneakyThrows
     private BigInteger getGasLimit(){
-       return web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST,true).send().getBlock().getGasLimit();
+        return  new BigDecimal(50000D).toBigInteger();
+     //  return web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST,true).send().getBlock().getGasLimit();
     }
 
     @SneakyThrows
