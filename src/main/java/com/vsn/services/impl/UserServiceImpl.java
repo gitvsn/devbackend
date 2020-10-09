@@ -177,8 +177,7 @@ public class UserServiceImpl implements UserService {
         userInfo.setSurname(userDTO.getSurname());
         userInfo.setUserId(user.getId());
         userInfo.setSecret(secret);
-        userInfo.setTwoFaLink(GoogleTwoFAService.getGoogleAuthenticatorBarCode(secret, "sincere", user.getEmail()));
-
+        userInfo.setTwoFaLink(GoogleTwoFAService.getGoogleAuthenticatorBarCode(secret, "vsn", user.getEmail()));
 
         return userInfo;
     }
