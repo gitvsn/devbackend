@@ -92,7 +92,8 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
     @Override
     public String sendToAddress(Wallet wallet, String addressTo, double amountDouble) throws  IOException, NotEnoughGas {
         log.info("Invoked send to {} in amount {}", addressTo, amountDouble);
-        BigInteger amount = new BigInteger(Double.toString(amountDouble));
+
+        BigInteger amount = BigDecimal.valueOf(amountDouble).toBigInteger();
 
         transferERC20Token(wallet,addressTo,amount);
         return  "";
