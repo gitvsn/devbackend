@@ -62,7 +62,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
     private static final ERC20Tokens token = ERC20Tokens.VSN;
     private static final Currency currency = ERC20Tokens.convertToCurrency(token);
-    private static final BigInteger GAS_LIMIT = BigInteger.valueOf(21_000L);
+
 
 
 
@@ -114,17 +114,18 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
         Credentials fromWalletCredentials = getCredentials(fromWallet);
         BigInteger gasPrice = getGasPrice();
+        BigInteger gasLimit = getGasLimit();
 
         log.info("Gas price: " + gasPrice);
-        log.info("Gas limit: " + GAS_LIMIT);
-        RawTransaction rawTransaction = getRawTransaction(fromWallet.getAddress(), to, value, token.contractAddress, GAS_LIMIT, gasPrice);
+        log.info("Gas limit: " + gasLimit);
+        RawTransaction rawTransaction = getRawTransaction(fromWallet.getAddress(), to, value, token.contractAddress, gasLimit, gasPrice);
 
         byte[] signMessage = TransactionEncoder.signMessage(rawTransaction, fromWalletCredentials);
         String hexValue = Numeric.toHexString(signMessage);
         //Send the transaction
         EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).send();
 
-      //  if(ethSendTransaction.getTransactionHash() != null) {
+        if(ethSendTransaction.getTransactionHash() != null) {
             log.info("Send transaction: {}", ethSendTransaction);
 
             log.debug("Funds " + value + " sent to "+ to+" account!!!");
@@ -143,9 +144,9 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
                             .type(TransactionType.WITHDRAW)
                             .userId(fromWallet.getUserId())
                             .build());
-//        } else {
-//            throw new  RuntimeException("Error transfer");
-//        }
+        } else {
+            throw new  RuntimeException("Error transfer");
+        }
     }
 
     private void transferERC20Token(String from, String to, BigInteger value) throws IOException, NotEnoughGas {
@@ -161,10 +162,11 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
         Credentials fromWalletCredentials = getCredentials(from);
         BigInteger gasPrice = getGasPrice();
+        BigInteger gasLimit = getGasLimit();
 
         log.info("Gas price: " + gasPrice);
-        log.info("Gas limit: " + GAS_LIMIT);
-        RawTransaction rawTransaction = getRawTransaction(from, to, value, token.contractAddress, GAS_LIMIT, gasPrice);
+        log.info("Gas limit: " + gasLimit);
+        RawTransaction rawTransaction = getRawTransaction(from, to, value, token.contractAddress, gasLimit, gasPrice);
 
         byte[] signMessage = TransactionEncoder.signMessage(rawTransaction, fromWalletCredentials);
         String hexValue = Numeric.toHexString(signMessage);
@@ -228,8 +230,13 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
     }
 
     @SneakyThrows
+    private BigInteger getGasLimit(){
+       return web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST,true).send().getBlock().getGasLimit();
+    }
+
+    @SneakyThrows
     private BigInteger getFee() {
-        BigInteger totalGas = Transfer.GAS_LIMIT.multiply(getGasPrice());
+        BigInteger totalGas = getGasLimit().multiply(getGasPrice());
         return (Convert.fromWei(totalGas.toString(), Convert.Unit.ETHER)).toBigInteger();
     }
 
