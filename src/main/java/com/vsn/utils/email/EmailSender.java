@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.toList;
 @Log4j2
 public class EmailSender {
 
-    private static final String CONFIRM_LOGIN = "VSN | Confirm login";
+    private static final String CONFIRM_LOGIN = "VSN | Reset password";
 
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
