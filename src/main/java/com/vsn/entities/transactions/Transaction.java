@@ -20,7 +20,7 @@ import java.math.BigInteger;
 @Table(name = "transactions")
 public class Transaction extends BaseEntity {
 
-    @Column(name = "hash",unique = true)
+    @Column(name = "hash")
     private String hash;
 
     @Column(name = "amount")
