@@ -274,9 +274,9 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
     private EthFilter getFilterRequest() {
         // TODO test data
-       //  DefaultBlockParameter startBlock = DefaultBlockParameter.valueOf(new BigInteger("11021191"));
+         DefaultBlockParameter startBlock = DefaultBlockParameter.valueOf(new BigInteger("11023463"));
 
-        EthFilter filter = new EthFilter(LATEST, LATEST, token.contractAddress);
+        EthFilter filter = new EthFilter(startBlock, LATEST, token.contractAddress);
         filter.addSingleTopic(EventEncoder.encode(TRANSFER_EVENT));
         return filter;
     }
@@ -338,7 +338,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
             this.contract = log.getAddress();
             this.from = "0x" + topics.get(1).substring(26);
             this.to = "0x" + topics.get(2).substring(26);
-            this.amount = getDecNumber(new BigDecimal(new BigInteger(log.getData().substring(2), 16)));
+            this.amount = (new BigDecimal(new BigInteger(log.getData().substring(2), 16)));
             this.blockNumber = log.getBlockNumber();
 
             return this;
