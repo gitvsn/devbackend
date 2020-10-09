@@ -218,9 +218,9 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
     private EthFilter getFilterRequest() {
         // TODO test data
-         DefaultBlockParameter startBlock = DefaultBlockParameter.valueOf(new BigInteger("11021191"));
+       //  DefaultBlockParameter startBlock = DefaultBlockParameter.valueOf(new BigInteger("11021191"));
 
-        EthFilter filter = new EthFilter(startBlock, LATEST, token.contractAddress);
+        EthFilter filter = new EthFilter(LATEST, LATEST, token.contractAddress);
         filter.addSingleTopic(EventEncoder.encode(TRANSFER_EVENT));
         return filter;
     }
