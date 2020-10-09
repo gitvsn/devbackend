@@ -32,6 +32,8 @@ public class RegistrationController {
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST, produces = "application/json")
     public MvcResponse registration(@RequestBody RegistrationUserDTO data, HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println(data);
         try {
             userService.register(data);
         } catch (RegistrationValidDataException e) {
