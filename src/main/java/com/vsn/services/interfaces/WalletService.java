@@ -7,6 +7,8 @@ import com.vsn.entities.wallets.Wallet;
 import com.vsn.exceptions.WrongBalanceException;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 public interface WalletService {
@@ -19,9 +21,9 @@ public interface WalletService {
 
     List<Wallet> getWalletsByCurrency(Currency currency);
 
-    Double getWalletBalance(Wallet wallet) throws IOException;
+    BigDecimal getWalletBalance(Wallet wallet) throws IOException;
 
-    double setUserBalance(Wallet wallet,double balance);
+    BigDecimal setUserBalance(Wallet wallet,BigDecimal balance);
 
     boolean sendToAddress(SendDTO sendDTO, User user) throws WrongBalanceException;
 

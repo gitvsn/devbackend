@@ -11,7 +11,9 @@ import java.util.stream.Stream;
 public enum ERC20Tokens {
 
 
-    USDT("0xdac17f958d2ee523a2206206994597c13d831ec7", 6);
+    USDT("0xdac17f958d2ee523a2206206994597c13d831ec7", 6),
+    BNB("0xB8c77482e45F1F44dE1745F52C74426C631bDD52", 18),
+    VSN("0x456ae45c0ce901e2e7c99c0718031cec0a7a59ff", 18);
 
     public final String contractAddress;
     public final int decimal;

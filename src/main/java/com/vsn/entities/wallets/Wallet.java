@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Data
 @Entity
@@ -30,8 +32,9 @@ public class Wallet extends BaseEntity {
     @Column(name = "qr_link")
     private String qrLink;
 
-    @Column(name = "balance")
-    private double balance;
+
+    @Column(nullable = false, precision = 19, scale = 8,name = "balance")
+    private BigDecimal balance = BigDecimal.ZERO;
 
     @JsonIgnore
     @Column(name = "password")

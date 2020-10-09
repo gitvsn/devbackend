@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.ECKeyPair;
@@ -23,6 +24,9 @@ public class EthBaseService {
     public String ethWalletDirectory;
     @Autowired
     public String ethWalletPassword;
+
+    private final static String nodeUrl = "http://104.219.251.31:8545";
+
     public Web3j web3j;
 
     final WalletRepository walletRepository;
@@ -30,17 +34,18 @@ public class EthBaseService {
 
 
     public EthBaseService(WalletRepository walletRepository, TransactionsService transactionsService) {
-        this.web3j = null;
+        this.web3j = connectionPool();
         this.walletRepository = walletRepository;
         this.transactionsService = transactionsService;
     }
 
 
 
+
     @SneakyThrows
     Web3j connectionPool() {
         log.info("Connect to node");
-        Web3j testNode = Web3j.build(new HttpService("http://134.122.52.134:8545"));
+        Web3j testNode = Web3j.build(new HttpService(nodeUrl));
         testNode.ethBlockNumber().send().getBlockNumber();
         return testNode;
     }
