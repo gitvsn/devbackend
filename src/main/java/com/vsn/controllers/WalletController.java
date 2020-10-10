@@ -55,13 +55,13 @@ public class WalletController {
     public MvcResponse send(@RequestBody SendDTO send , HttpServletRequest request) {
         User user = jwtTokenProvider.getUser(request);
         try {
-           walletService.sendToAddress(send,user);
+             walletService.sendToAddress(send,user);
             return  new MvcResponseObject(200,true);
         } catch (WrongBalanceException e) {
             return new MvcResponseError(400, "Wrong  balance");
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (NotEnoughGas notEnoughGas) {
+        } catch (NotEnoughGas | RuntimeException notEnoughGas) {
             return new MvcResponseError(400, notEnoughGas.getMessage() );
         }
 

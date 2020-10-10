@@ -90,7 +90,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
 
     @Override
-    public String sendToAddress(Wallet wallet, String addressTo, double amountDouble) throws  IOException, NotEnoughGas {
+    public String sendToAddress(Wallet wallet, String addressTo, double amountDouble) throws IOException, NotEnoughGas, WrongBalanceException {
         log.info("Invoked send to {} in amount {}", addressTo, amountDouble);
 
         BigInteger amount = BigDecimal.valueOf(amountDouble).toBigInteger();
@@ -104,11 +104,14 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
         return wallet.getBalance();
     }
 
-    private void transferERC20Token(Wallet fromWallet, String to, BigInteger value) throws IOException, NotEnoughGas {
-
+    private void transferERC20Token(Wallet fromWallet, String to, BigInteger value) throws IOException, NotEnoughGas, WrongBalanceException {
         log.info(token + " Tokens " + value + " from address {} sent to {}", fromWallet.getAddress(), to);
 
-        if(getFee().compareTo(getEthBalance(fromWallet.getAddress())) > 0){
+
+        if(value.compareTo(getTokenBalance(fromWallet.getAddress()).toBigInteger()) > 0){
+            throw new WrongBalanceException("Wrong balance");
+        }
+        if(getFee().compareTo(new BigDecimal(getEthBalance(fromWallet.getAddress()))) > 0){
             throw new NotEnoughGas("Not enough gas " + getFee());
         }
 
@@ -145,7 +148,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
                             .userId(fromWallet.getUserId())
                             .build());
         } else {
-            throw new  RuntimeException("Error transfer");
+            throw new  RuntimeException(ethSendTransaction.getError().getMessage());
         }
     }
 
@@ -156,7 +159,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
         log.info(token + " Tokens " + value + " from address {} sent to {}", from, to);
 
-        if(getFee().compareTo(getEthBalance(from)) > 0){
+        if(getFee().compareTo(new BigDecimal(getEthBalance(from))) > 0){
             throw new NotEnoughGas("Not enough gas " + getFee());
         }
 
@@ -236,9 +239,9 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
     }
 
     @SneakyThrows
-    private BigInteger getFee() {
+    private BigDecimal getFee() {
         BigInteger totalGas = getGasLimit().multiply(getGasPrice());
-        return (Convert.fromWei(totalGas.toString(), Convert.Unit.ETHER)).toBigInteger();
+        return (Convert.fromWei(totalGas.toString(), Convert.Unit.ETHER));
     }
 
     @NotNull
@@ -259,7 +262,6 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
         web3j.ethLogFlowable(getFilterRequest()).subscribe(log -> {
             TokenTransaction tx = new TokenTransaction().fillByFilterLog(log);
-
             if (getAccounts().contains(tx.to)) {
                 processDepositWallet(tx);
             }
