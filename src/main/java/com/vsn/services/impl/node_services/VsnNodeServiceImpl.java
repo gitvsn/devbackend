@@ -116,9 +116,9 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
         if(value.compareTo(getTokenBalance(fromWallet.getAddress()).toBigInteger()) > 0){
             throw new WrongBalanceException("Wrong balance");
         }
-        if(getFee().compareTo(new BigDecimal(getEthBalance(fromWallet.getAddress()))) > 0){
-            throw new NotEnoughGas("Not enough gas " + getFee());
-        }
+//        if(getFee().compareTo(new BigDecimal(getEthBalance(fromWallet.getAddress()))) > 0){
+//            throw new NotEnoughGas("Not enough gas " + getFee());
+//        }
 
         Credentials fromWalletCredentials = getCredentials(fromWallet);
         BigInteger gasPrice = getGasPrice();
