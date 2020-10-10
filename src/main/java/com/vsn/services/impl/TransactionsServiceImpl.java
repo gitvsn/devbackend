@@ -10,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -53,6 +56,16 @@ public class TransactionsServiceImpl implements TransactionsService {
     @Override
     public List<Transaction> getByCurrencyAndTxType(Currency currency, TransactionType transactionType) {
         return  transactionsRepository.getAllByCurrencyAndType(currency,transactionType);
+    }
+
+    @Override
+    public Map<String, BigDecimal> getTransactionsAmount(User user) {
+        Map<String, BigDecimal> trInfoMap = new HashMap<>();
+
+        trInfoMap.put("withdraw", transactionsRepository.getSumBuyWithdraw(user.getId()));
+        trInfoMap.put("deposit", transactionsRepository.getSumBuyDeposit(user.getId()));
+
+        return  trInfoMap;
     }
 
 }

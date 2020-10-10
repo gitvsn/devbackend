@@ -31,7 +31,6 @@ import java.util.List;
 @RequestMapping(value = "/api")
 public class TransactionsController {
 
-
     private final JwtTokenProvider jwtTokenProvider;
     private final TransactionsService transactionsService;
 

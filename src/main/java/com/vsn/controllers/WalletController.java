@@ -9,6 +9,7 @@ import com.vsn.entities.wallets.Wallet;
 import com.vsn.exceptions.NotEnoughGas;
 import com.vsn.exceptions.WrongBalanceException;
 import com.vsn.securiry.jwt.JwtTokenProvider;
+import com.vsn.services.interfaces.TransactionsService;
 import com.vsn.services.interfaces.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +37,7 @@ public class WalletController {
 
     private final WalletService walletService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TransactionsService transactionsService;
 
 
     @RequestMapping(value = "/getWallets", method = RequestMethod.POST, produces = "application/json")
@@ -46,6 +48,16 @@ public class WalletController {
         walletList.sort(Comparator.comparing(Wallet::getCurrency));
 
            return  new MvcResponseObject(200,walletList);
+        } catch (Exception ex) {
+            return new MvcResponseError(400, "Error get wallets");
+        }
+    }
+
+    @RequestMapping(value = "/get_transactions_info", method = RequestMethod.POST, produces = "application/json")
+    public MvcResponse getTransactionsInfo(HttpServletRequest request, HttpServletResponse response) {
+        User user = jwtTokenProvider.getUser(request);
+        try {
+            return  new MvcResponseObject(200, transactionsService.getTransactionsAmount(user));
         } catch (Exception ex) {
             return new MvcResponseError(400, "Error get wallets");
         }

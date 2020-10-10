@@ -5,7 +5,9 @@ import com.vsn.entities.transactions.Transaction;
 import com.vsn.entities.transactions.TransactionType;
 import com.vsn.entities.wallets.Currency;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface TransactionsService {
 
@@ -22,4 +24,6 @@ public interface TransactionsService {
     List <Transaction> getByCurrency(Currency currency);
 
     List <Transaction> getByCurrencyAndTxType(Currency currency, TransactionType transactionType);
+
+    Map<String, BigDecimal> getTransactionsAmount(User user);
 }

@@ -51,7 +51,7 @@ public class TwoFaController {
             }
 
             String secret = userInfoService.getByUser(user).getSecret();
-
+            
             if (GoogleTwoFAService.getTOTPCode(secret).equals(code)) {
                 UserToken token = userService.getTokenByUserEmail(user.getEmail());
 
