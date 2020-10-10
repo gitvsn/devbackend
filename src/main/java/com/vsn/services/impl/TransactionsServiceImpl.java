@@ -61,9 +61,14 @@ public class TransactionsServiceImpl implements TransactionsService {
     @Override
     public Map<String, BigDecimal> getTransactionsAmount(User user) {
         Map<String, BigDecimal> trInfoMap = new HashMap<>();
+        BigDecimal withdraw = transactionsRepository.getSumBuyWithdraw(user.getId()) == null ?
+                new BigDecimal(0) : transactionsRepository.getSumBuyWithdraw(user.getId());
 
-        trInfoMap.put("withdraw", transactionsRepository.getSumBuyWithdraw(user.getId()));
-        trInfoMap.put("deposit", transactionsRepository.getSumBuyDeposit(user.getId()));
+        BigDecimal deposit = transactionsRepository.getSumBuyDeposit(user.getId()) == null ?
+                new BigDecimal(0) : transactionsRepository.getSumBuyDeposit(user.getId());
+
+        trInfoMap.put("withdraw", withdraw);
+        trInfoMap.put("deposit", deposit);
 
         return  trInfoMap;
     }
