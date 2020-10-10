@@ -30,4 +30,6 @@ public interface TransactionsService {
     List <Transaction> getByCurrencyAndTxType(Currency currency, TransactionType transactionType);
 
     Map<String, BigDecimal> getTransactionsAmount(User user);
+
+    Map<Long, BigDecimal> getTransactionsData(User user);
 }

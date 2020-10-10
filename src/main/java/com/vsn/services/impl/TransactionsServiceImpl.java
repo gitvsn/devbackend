@@ -12,9 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static com.vsn.entities.transactions.TransactionType.WITHDRAW;
 
 @Slf4j
 @Service
@@ -75,6 +79,27 @@ public class TransactionsServiceImpl implements TransactionsService {
 
         trInfoMap.put("withdraw", withdraw);
         trInfoMap.put("deposit", deposit);
+
+        return  trInfoMap;
+    }
+
+    @Override
+    public Map<Long, BigDecimal> getTransactionsData(User user) {
+        Map<Long, BigDecimal> trInfoMap = new HashMap<>();
+        BigDecimal balance = new BigDecimal(0);
+        trInfoMap.put(user.getCreated(), balance);
+
+        List<Transaction> trList = transactionsRepository.getByUserIdAndStatus(user.getId(), TransactionStatus.SUCCESS);
+        if(trList != null){
+            for (Transaction transaction : trList) {
+                if (transaction.getType()== TransactionType.WITHDRAW) {
+                    balance = balance.subtract(transaction.getAmount());
+                } else if (transaction.getType()== TransactionType.DEPOSIT) {
+                    balance = balance.add(transaction.getAmount());
+                }
+                trInfoMap.put(transaction.getCreated(), balance);
+            }
+        }
 
         return  trInfoMap;
     }

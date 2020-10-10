@@ -59,7 +59,17 @@ public class WalletController {
         try {
             return  new MvcResponseObject(200, transactionsService.getTransactionsAmount(user));
         } catch (Exception ex) {
-            return new MvcResponseError(400, "Error get wallets");
+            return new MvcResponseError(400, "Error get transactions");
+        }
+    }
+
+    @RequestMapping(value = "/get_transactions_to_chart", method = RequestMethod.POST, produces = "application/json")
+    public MvcResponse getTransactionsToChart(HttpServletRequest request, HttpServletResponse response) {
+        User user = jwtTokenProvider.getUser(request);
+        try {
+            return  new MvcResponseObject(200, transactionsService.getTransactionsData(user));
+        } catch (Exception ex) {
+            return new MvcResponseError(400, "Error get transactions");
         }
     }
 

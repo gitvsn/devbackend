@@ -14,6 +14,7 @@ public interface TransactionsRepository  extends CrudRepository<Transaction, Str
     List <Transaction> findAll();
     List <Transaction> getAllByStatus(TransactionStatus status);
     List <Transaction> getByUserId(Long userId);
+    List <Transaction> getByUserIdAndStatus(long userId, TransactionStatus transactionStatus);
     List <Transaction> getByUserIdAndCurrency(Long userId, Currency currency);
     List <Transaction> getByUserIdAndCurrencyOrCurrency(Long userId, Currency currency,Currency currency2);
     List <Transaction> getByCurrency(Currency currency);
