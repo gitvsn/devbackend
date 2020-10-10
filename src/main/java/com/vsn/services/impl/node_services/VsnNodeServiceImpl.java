@@ -1,6 +1,7 @@
 package com.vsn.services.impl.node_services;
 
 import com.vsn.entities.registration.User;
+import com.vsn.entities.transactions.Transaction;
 import com.vsn.entities.transactions.TransactionStatus;
 import com.vsn.entities.transactions.TransactionType;
 import com.vsn.entities.wallets.Currency;
@@ -17,6 +18,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.abi.EventEncoder;
@@ -28,8 +30,10 @@ import org.web3j.crypto.*;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
+import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.Log;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
@@ -45,6 +49,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -134,16 +139,13 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
             log.debug("Funds " + value + " sent to "+ to+" account!!!");
 
             String hash = ethSendTransaction.getTransactionHash();
-            fromWallet.setBalance(fromWallet.getBalance().subtract(new BigDecimal(value)));
 
-
-            walletRepository.save(fromWallet);
             transactionsService.saveTransaction(
                     com.vsn.entities.transactions.Transaction.builder()
                             .hash(hash)
                             .amount(new BigDecimal(value))
                             .currency(currency)
-                            .status(TransactionStatus.SUCCESS)
+                            .status(TransactionStatus.PENDING)
                             .type(TransactionType.WITHDRAW)
                             .userId(fromWallet.getUserId())
                             .build());
@@ -200,7 +202,6 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
         }
     }
 
-
     private BigDecimal getTokenBalance(String address) {
         try {
             String respBalance = web3j
@@ -256,10 +257,6 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
     @SneakyThrows
     @PostConstruct
     private void runERC20Observe(){
-        // TODO test data
-//        System.out.println(getTokenBalance("0x4a7d4f98ea6a8047310a2ff8ac2167ecd37a7ef8")
-//                .divide(new BigDecimal("1000000000000000000"),4, RoundingMode.FLOOR));
-
         web3j.ethLogFlowable(getFilterRequest()).subscribe(log -> {
             TokenTransaction tx = new TokenTransaction().fillByFilterLog(log);
             if (getAccounts().contains(tx.to)) {
@@ -291,10 +288,17 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
                 .collect(Collectors.toSet());
     }
 
-    private BigDecimal getDecNumber(BigDecimal value){
-        return  value.divide(new BigDecimal("1000000000000000000"),4, RoundingMode.FLOOR);
-    }
 
+    @Scheduled(fixedDelay = 60*1000)
+    public void checkPendingTransactions(){
+        List<Transaction> transactions = transactionsService.getByStatus(TransactionStatus.PENDING);
+
+        transactions.forEach(transaction -> {
+            if(checkTransactionStatus(transaction.getHash()) != TransactionStatus.PENDING){
+                processWithdrawWallet(transaction);
+            }
+        });
+    }
 
     @Transactional
     void processDepositWallet(TokenTransaction transaction){
@@ -321,6 +325,44 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
                         .userId(depositWallet.getUserId())
                         .build());
     }
+
+    @Transactional
+    void processWithdrawWallet(Transaction transaction){
+        Wallet fromWallet = walletRepository.getAllByUserId(transaction.getUserId()).get(0);
+
+        if(checkTransactionStatus(transaction.getHash()) != TransactionStatus.PENDING){
+            fromWallet.setBalance(fromWallet.getBalance().subtract(transaction.getAmount()));
+            walletRepository.save(fromWallet);
+            transaction.setStatus(TransactionStatus.SUCCESS);
+            transactionsService.saveTransaction(transaction);
+        }
+        if(checkTransactionStatus(transaction.getHash()) == TransactionStatus.FAILED){
+            transaction.setStatus(TransactionStatus.FAILED);
+            transactionsService.saveTransaction(transaction);
+        }
+    }
+
+    private TransactionStatus checkTransactionStatus(String hash) {
+        Optional<TransactionReceipt> receipt;
+        try {
+            receipt = web3j.ethGetTransactionReceipt(hash).send().getTransactionReceipt();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return TransactionStatus.PENDING;
+        }
+
+        if(receipt.isEmpty()){
+            return TransactionStatus.PENDING;
+        }
+        if(receipt.get().isStatusOK()){
+            return TransactionStatus.SUCCESS;
+        }
+        else {
+            return  TransactionStatus.FAILED;
+        }
+    }
+
+
 
 
 

@@ -2,6 +2,7 @@ package com.vsn.services.impl;
 
 import com.vsn.entities.registration.User;
 import com.vsn.entities.transactions.Transaction;
+import com.vsn.entities.transactions.TransactionStatus;
 import com.vsn.entities.transactions.TransactionType;
 import com.vsn.entities.wallets.Currency;
 import com.vsn.repositories.TransactionsRepository;
@@ -36,6 +37,11 @@ public class TransactionsServiceImpl implements TransactionsService {
     @Override
     public Transaction saveTransaction(Transaction transaction) {
         return  transactionsRepository.save(transaction);
+    }
+
+    @Override
+    public List<Transaction> getByStatus(TransactionStatus status) {
+        return  transactionsRepository.getAllByStatus(status);
     }
 
     @Override
