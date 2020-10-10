@@ -44,6 +44,11 @@ public class TransactionsServiceImpl implements TransactionsService {
     }
 
     @Override
+    public List<Transaction> getByStatus(TransactionStatus status) {
+        return  transactionsRepository.getAllByStatus(status);
+    }
+
+    @Override
     public List<Transaction> getByUserAndCurrency(Long userId, Currency currency) {
         return transactionsRepository.getByUserIdAndCurrency(userId,currency);
     }

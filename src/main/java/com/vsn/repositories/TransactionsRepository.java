@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface TransactionsRepository  extends CrudRepository<Transaction, String> {
     List <Transaction> findAll();
+    List <Transaction> getAllByStatus(TransactionStatus status);
     List <Transaction> getByUserId(Long userId);
     List <Transaction> getByUserIdAndStatus(long userId, TransactionStatus transactionStatus);
     List <Transaction> getByUserIdAndCurrency(Long userId, Currency currency);
