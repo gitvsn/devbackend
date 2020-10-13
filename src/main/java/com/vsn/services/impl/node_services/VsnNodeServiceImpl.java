@@ -137,7 +137,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
         if(ethSendTransaction.getTransactionHash() != null) {
             log.info("Send transaction: {}", ethSendTransaction);
 
-            log.debug("Funds " + value + " sent to "+ to+" account!!!");
+            log.debug("Funds " + getDecNumber(new BigDecimal(value)) + " sent to "+ to+" account!!!");
 
             String hash = ethSendTransaction.getTransactionHash();
 
