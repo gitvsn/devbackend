@@ -13,6 +13,7 @@ import com.vsn.services.interfaces.UserService;
 import com.vsn.utils.page.InnerPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,14 +37,18 @@ public class TransactionsController {
 
     @RequestMapping(value = "/get_user_transactions", method = RequestMethod.POST, produces = "application/json")
     public MvcResponse getUserTransactions(@RequestParam(value = "page", defaultValue = "1") Integer page,
-                                           @RequestParam(value = "size", defaultValue = "10") Integer size,HttpServletRequest request) {
+                                           @RequestParam(value = "size", defaultValue = "10") Integer size,
+                                           HttpServletRequest request) {
         User user = jwtTokenProvider.getUser(request);
         List transList = transactionsService.getByUser(user);
 
         InnerPage innerPage = new InnerPage(transList);
 
+        PageImpl s = innerPage.getPageInObjectList(page,size);
+
         try {
-            return  new MvcResponseObject(200,innerPage.getPageInObjectList(page,size));
+          //  return  new MvcResponseObject(200,innerPage.getPageInObjectList(page,size));
+            return  new MvcResponseObject(200,transList);
         } catch (Exception ex) {
             return new MvcResponseError(400, "Error");
         }
