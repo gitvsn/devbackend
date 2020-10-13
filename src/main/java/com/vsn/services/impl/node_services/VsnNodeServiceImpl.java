@@ -333,7 +333,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
         transactionsService.saveTransaction(
                 com.vsn.entities.transactions.Transaction.builder()
                         .hash(transaction.hash)
-                        .amount(getDecNumber(transaction.amount))
+                        .amount(transaction.amount)
                         .currency(currency)
                         .status(TransactionStatus.SUCCESS)
                         .type(TransactionType.DEPOSIT)
@@ -397,7 +397,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
             this.contract = log.getAddress();
             this.from = "0x" + topics.get(1).substring(26);
             this.to = "0x" + topics.get(2).substring(26);
-            this.amount = (new BigDecimal(new BigInteger(log.getData().substring(2), 16)));
+            this.amount = getDecNumber(new BigDecimal(new BigInteger(log.getData().substring(2), 16)));
             this.blockNumber = log.getBlockNumber();
 
 
