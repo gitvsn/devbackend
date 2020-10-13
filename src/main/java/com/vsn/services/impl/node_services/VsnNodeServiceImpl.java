@@ -69,8 +69,6 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
     private static final Currency currency = ERC20Tokens.convertToCurrency(token);
 
 
-
-
     @Override
     public Wallet createWallet(@NotNull User user) throws IOException, CipherException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         String walletName = WalletUtils.generateNewWalletFile(ethWalletPassword, new File(ethWalletDirectory));
@@ -99,17 +97,20 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
         log.info("Invoked send to {} in amount {}", addressTo, amountDouble);
 
         BigInteger amount = BigDecimal.valueOf(amountDouble).toBigInteger();
+        amount = setDecNumber(amount);
 
         transferERC20Token(wallet,addressTo,amount);
         return  "";
     }
+
+
 
     @Override
     public BigDecimal getBalanceWallet(@NotNull Wallet wallet) {
         return wallet.getBalance();
     }
 
-    private void transferERC20Token(Wallet fromWallet, String to, BigInteger value) throws IOException, NotEnoughGas, WrongBalanceException {
+    private void transferERC20Token(Wallet fromWallet, String to, BigInteger value) throws IOException, WrongBalanceException {
         log.info(token + " Tokens " + value + " from address {} sent to {}", fromWallet.getAddress(), to);
 
 
@@ -143,7 +144,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
             transactionsService.saveTransaction(
                     com.vsn.entities.transactions.Transaction.builder()
                             .hash(hash)
-                            .amount(new BigDecimal(value))
+                            .amount(getDecNumber(new BigDecimal(value)))
                             .currency(currency)
                             .status(TransactionStatus.PENDING)
                             .type(TransactionType.WITHDRAW)
@@ -161,9 +162,9 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
         log.info(token + " Tokens " + value + " from address {} sent to {}", from, to);
 
-        if(getFee().compareTo(new BigDecimal(getEthBalance(from))) > 0){
-            throw new NotEnoughGas("Not enough gas " + getFee());
-        }
+//        if(getFee().compareTo(new BigDecimal(getEthBalance(from))) > 0){
+//            throw new NotEnoughGas("Not enough gas " + getFee());
+//        }
 
         Credentials fromWalletCredentials = getCredentials(from);
         BigInteger gasPrice = getGasPrice();
@@ -209,12 +210,14 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
                             (null, null, null, null, token.contractAddress, null,
                                     createBalanceData(address)), LATEST).send().getValue();
 
-            return  "0x".equals(respBalance) ? BigDecimal.ZERO : new BigDecimal(new BigInteger((respBalance).substring(2), 16));
+            return  "0x".equals(respBalance) ? BigDecimal.ZERO : (new BigDecimal(new BigInteger((respBalance).substring(2), 16)));
         } catch ( IOException e){
             log.error("Don`t write balance {}",address);
             return BigDecimal.ZERO;
         }
     }
+
+
 
     @SneakyThrows
     private RawTransaction getRawTransaction(String from, String to, BigInteger value, String contractAddress, BigInteger gasLimit, BigInteger gasPrice) {
@@ -273,7 +276,9 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
     private EthFilter getFilterRequest() {
         // TODO test data
-        // DefaultBlockParameter startBlock = DefaultBlockParameter.valueOf(new BigInteger("11023463"));
+     //    DefaultBlockParameter startBlock = DefaultBlockParameter.valueOf(new BigInteger("11039643"));
+//         DefaultBlockParameter startBlock = DefaultBlockParameter.valueOf(new BigInteger(
+//                 "11021191"));
 
         EthFilter filter = new EthFilter(LATEST, LATEST, token.contractAddress);
         filter.addSingleTopic(EventEncoder.encode(TRANSFER_EVENT));
@@ -300,6 +305,16 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
         });
     }
 
+
+
+    private BigDecimal getDecNumber(BigDecimal value){
+        return  value.divide(new BigDecimal("1000000000000000000"),2, RoundingMode.UP);
+    }
+
+    private  BigInteger setDecNumber(BigInteger value){
+        return  value.multiply(new BigInteger("1000000000000000000"));
+    }
+
     @Transactional
     void processDepositWallet(TokenTransaction transaction){
         log.info(" =======  Deposit tx ======");
@@ -318,7 +333,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
         transactionsService.saveTransaction(
                 com.vsn.entities.transactions.Transaction.builder()
                         .hash(transaction.hash)
-                        .amount(transaction.amount)
+                        .amount(getDecNumber(transaction.amount))
                         .currency(currency)
                         .status(TransactionStatus.SUCCESS)
                         .type(TransactionType.DEPOSIT)
@@ -384,6 +399,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
             this.to = "0x" + topics.get(2).substring(26);
             this.amount = (new BigDecimal(new BigInteger(log.getData().substring(2), 16)));
             this.blockNumber = log.getBlockNumber();
+
 
             return this;
         }
