@@ -96,7 +96,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
     public String sendToAddress(Wallet wallet, String addressTo, double amountDouble) throws IOException, NotEnoughGas, WrongBalanceException {
         log.info("Invoked send to {} in amount {}", addressTo, amountDouble);
 
-        BigInteger amount = BigDecimal.valueOf(amountDouble).toBigInteger();
+        BigInteger amount =  setDecNumber(BigDecimal.valueOf(amountDouble)).toBigInteger();
         amount = setDecNumber(amount);
 
         transferERC20Token(wallet,addressTo,amount);
@@ -210,7 +210,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
                             (null, null, null, null, token.contractAddress, null,
                                     createBalanceData(address)), LATEST).send().getValue();
 
-            return  "0x".equals(respBalance) ? BigDecimal.ZERO : (new BigDecimal(new BigInteger((respBalance).substring(2), 16)));
+            return  "0x".equals(respBalance) ? BigDecimal.ZERO : setDecNumber(new BigDecimal(new BigInteger((respBalance).substring(2), 16)));
         } catch ( IOException e){
             log.error("Don`t write balance {}",address);
             return BigDecimal.ZERO;
@@ -313,6 +313,9 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
     private  BigInteger setDecNumber(BigInteger value){
         return  value.multiply(new BigInteger("1000000000000000000"));
+    }
+    private  BigDecimal setDecNumber(BigDecimal value){
+        return  value.multiply(new BigDecimal("1000000000000000000"));
     }
 
     @Transactional
