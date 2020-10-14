@@ -97,7 +97,6 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
         log.info("Invoked send to {} in amount {}", addressTo, amountDouble);
 
         BigInteger amount =  setDecNumber(BigDecimal.valueOf(amountDouble)).toBigInteger();
-        amount = setDecNumber(amount);
 
         transferERC20Token(wallet,addressTo,amount);
         return  "";
