@@ -307,7 +307,7 @@ public class VsnNodeServiceImpl extends EthBaseService implements NodeService {
 
 
     private BigDecimal getDecNumber(BigDecimal value){
-        return  value.divide(new BigDecimal("1000000000000000000"),2, RoundingMode.UP);
+        return  value.divide(new BigDecimal("1000000000000000000"),18, RoundingMode.UP);
     }
 
     private  BigInteger setDecNumber(BigInteger value){
